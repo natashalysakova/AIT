@@ -1,0 +1,57 @@
+﻿@using System
+@using AppStore.Controllers
+@using AppStore.Models
+@model AppStore.Controllers.RecomendationModel
+@{
+    ViewBag.Title = "Index";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h2>Персональные рекомендации</h2>
+    <ul>
+        @foreach (PersonalReccomendation reccomendation in Model.PersonalRecomendation)
+        {
+            <li>@reccomendation.App.Title <i>(@reccomendation.App.Genres.Title)</i> - @reccomendation.User.Name.Split(new char[] { '@' }, StringSplitOptions.RemoveEmptyEntries)[0]</li>
+        }
+    </ul>
+}
+
+<h2>Лучшие игры</h2>
+<ul>
+    @foreach (BestGame game in Model.BestGames)
+    {
+        <li>@game.Apps.Title <i>(@game.Apps.Genres.Title)</i> - <b>@game.AvgScore/5</b></li>
+    }
+</ul>
+
+
+
+<h2>Таблица схожести</h2>
+<table class="table table-bordered">
+    <tr>
+        <th></th>
+        @foreach (Users user in Model.Users)
+        {
+            <th>@user.Name.Split(new char[] {'@'}, StringSplitOptions.RemoveEmptyEntries)[0]</th>
+        }
+    </tr>
+    @foreach (Users user in Model.Users)
+    {
+        <tr>
+            <th>@user.Name.Split(new char[] { '@' }, StringSplitOptions.RemoveEmptyEntries)[0]</th>
+            @foreach (Users user2 in Model.Users)
+            {
+                foreach (Likness likness in Model.Liknesses)
+                {
+                    if (likness.First == user && likness.Second == user2)
+                    {
+                        <td>
+                            @Math.Round(likness.LiknessScore,4)
+                        </td>
+                    }
+                }
+            }
+        </tr>
+    }
+</table>

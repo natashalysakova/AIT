@@ -1,0 +1,46 @@
+﻿@model System.Collections.Generic.IEnumerable<AppStore.Models.Scores>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create", "Scores")
+</p>
+<p>
+    @Html.ActionLink("Сгенерировать случайных оценок", "GenerateRandomScores", "Scores")
+</p>
+<p>
+    @Html.ActionLink("Удалить все оценки", "RemoveAllScores", "Scores")
+</p>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Score)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Apps.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Users.Name)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Score)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Apps.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Users.Name)
+        </td>
+    </tr>
+}
+
+</table>
