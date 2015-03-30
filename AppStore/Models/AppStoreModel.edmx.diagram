@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="922d87b67f0a4fd890555aea445f2ffc" Name="Diagram1">
+        <EntityTypeShape EntityType="AppStoreDbModel.Apps" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="AppStoreDbModel.Genres" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="AppStoreDbModel.Scores" Width="1.5" PointX="5.25" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AppStoreDbModel.Users" Width="1.5" PointX="3" PointY="5.25" IsExpanded="true" />
+        <AssociationConnector Association="AppStoreDbModel.FK_App_ToGenres" ManuallyRouted="false" />
+        <AssociationConnector Association="AppStoreDbModel.FK_Scores_ToApps" ManuallyRouted="false" />
+        <AssociationConnector Association="AppStoreDbModel.FK_Scores_ToUsers" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
