@@ -7,11 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace AppStore.Models
 {
-    using System;
-    using System.Collections.Generic;
-    
     public partial class Genres
     {
         public Genres()

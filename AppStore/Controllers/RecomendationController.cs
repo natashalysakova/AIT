@@ -23,57 +23,39 @@ namespace AppStore.Controllers
                 {
                     if (user.Name == otherUser.Name)
                     {
-                        liknesses.Add(new Likness() {First = user, Second = otherUser, LiknessScore = 0});
+                        liknesses.Add(new Likness() { First = user, Second = otherUser, LiknessScore = 0 });
                     }
                     else
                     {
-                        List<Apps> togetherApps = new List<Apps>();
+                        List<Apps> togetherApps = (from userScore in user.Scores from otherScores in otherUser.Scores where userScore.Apps == otherScores.Apps select userScore.Apps).ToList();
 
-                        foreach (Scores userScore in user.Scores)
-                        {
-                            foreach (Scores otherScores in otherUser.Scores)
-                            {
-                                if (userScore.Apps == otherScores.Apps)
-                                {
-                                    togetherApps.Add(userScore.Apps);
-                                }
-                            }
-                        }
 
-                        double summ = 0;
-                        foreach (Scores userScore in user.Scores)
-                        {
-                            foreach (Scores otherScores in otherUser.Scores)
-                            {
-                                if (togetherApps.Contains(userScore.Apps) && togetherApps.Contains(otherScores.Apps))
-                                {
-                                    double fufa = userScore.Score;
-                                    double fusa =
-                                        (from score in user.Scores
-                                            where score.Apps == otherScores.Apps
-                                            select score.Score)
-                                            .FirstOrDefault();
+                        double summ = (
+                            from userScore in user.Scores
+                            from otherScores in otherUser.Scores
+                            where togetherApps.Contains(userScore.Apps) && togetherApps.Contains(otherScores.Apps)
+                            let fufa = userScore.Score
+                            let fusa = (
+                                from score in user.Scores
+                                where score.Apps == otherScores.Apps
+                                select score.Score).FirstOrDefault()
+                            let sufa = (
+                                from score in otherUser.Scores
+                                where score.Apps == otherScores.Apps
+                                select score.Score).FirstOrDefault()
+                            let susa = otherScores.Score
+                            select Math.Abs((fufa - (double)sufa) + (fusa - (double)susa))).Sum();
 
-                                    double sufa =
-                                        (from score in otherUser.Scores
-                                            where score.Apps == otherScores.Apps
-                                            select score.Score)
-                                            .FirstOrDefault();
-                                    double susa = otherScores.Score;
-                                    summ += Math.Abs((fufa - sufa) + (fusa - susa));
-                                }
-                            }
-                        }
                         double liknessScore = 0;
 
-                        if (summ != 0.0)
-                            liknessScore = 1.0/Math.Sqrt(summ);
+                        if (Math.Abs(summ) > 0)
+                            liknessScore = 1.0 / Math.Sqrt(summ);
 
-                        liknesses.Add(new Likness() {First = user, Second = otherUser, LiknessScore = liknessScore});
+                        liknesses.Add(new Likness() { First = user, Second = otherUser, LiknessScore = liknessScore });
                     }
                 }
 
-               users.Add(user);
+                users.Add(user);
             }
 
 
@@ -86,36 +68,27 @@ namespace AppStore.Controllers
                 {
                     List<Likness> usersLikeMe = new List<Likness>();
                     double maxLikness = 0;
-                    foreach (Likness likness in liknesses)
+                    foreach (Likness likness in liknesses.Where(likness => likness.First == user))
                     {
-                        if (likness.First == user)
+                        usersLikeMe.Add(likness);
+                        if (likness.LiknessScore > maxLikness)
                         {
-                            usersLikeMe.Add(likness);
-                            if (likness.LiknessScore > maxLikness)
-                            {
-                                maxLikness = likness.LiknessScore;
-                            }
+                            maxLikness = likness.LiknessScore;
                         }
                     }
 
                     usersLikeMe =
                         usersLikeMe.OrderByDescending(x => x.LiknessScore)
-                            .Where(x => (x.LiknessScore >= (0.75*maxLikness)))
+                            .Where(x => (x.LiknessScore >= (0.75 * maxLikness)))
                             .ToList();
 
                     List<Apps> userApps = (from scores in user.Scores select scores.Apps).ToList();
 
                     foreach (Likness likness in usersLikeMe)
                     {
-                        List<Apps> otherUserApps = (from scores in likness.Second.Scores where scores.Score>4 select scores.Apps).ToList();
+                        List<Apps> otherUserApps = (from scores in likness.Second.Scores where scores.Score > 4 select scores.Apps).ToList();
 
-                        foreach (Apps apps in otherUserApps)
-                        {
-                            if (!userApps.Contains(apps))
-                            {
-                                personalReccomendation.Add(new PersonalReccomendation(){App = apps, User = likness.Second});
-                            }
-                        }
+                        personalReccomendation.AddRange(from apps in otherUserApps where !userApps.Contains(apps) select new PersonalReccomendation() { App = apps, User = likness.Second });
                     }
                 }
             }
@@ -125,13 +98,9 @@ namespace AppStore.Controllers
             List<Apps> appses = _db.Apps.ToList();
             foreach (Apps apps in appses)
             {
-                var app = new BestGame() {Apps = apps};
-                double avg = 0;
-                foreach (Scores scores in apps.Scores)
-                {
-                    avg += scores.Score;
-                }
-                avg = avg/apps.Scores.Count;
+                var app = new BestGame() { Apps = apps };
+                double avg = apps.Scores.Aggregate<Scores, double>(0, (current, scores) => current + scores.Score);
+                avg = avg / apps.Scores.Count;
                 app.AvgScore = avg;
 
 
@@ -145,11 +114,13 @@ namespace AppStore.Controllers
             }
 
 
-            RecomendationModel model = new RecomendationModel();
-            model.Liknesses = liknesses;
-            model.Users = users;
-            model.BestGames = bestOfThebest;
-            model.PersonalRecomendation = personalReccomendation;
+            RecomendationModel model = new RecomendationModel
+            {
+                Liknesses = liknesses,
+                Users = users,
+                BestGames = bestOfThebest,
+                PersonalRecomendation = personalReccomendation
+            };
 
             return View(model);
         }
@@ -168,7 +139,7 @@ namespace AppStore.Controllers
     {
         public Users First { get; set; }
         public Users Second { get; set; }
-        public double LiknessScore{ get; set; }
+        public double LiknessScore { get; set; }
     }
 
     class Together

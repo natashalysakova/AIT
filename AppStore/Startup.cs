@@ -1,7 +1,8 @@
-﻿using Microsoft.Owin;
+﻿using AppStore;
+using Microsoft.Owin;
 using Owin;
 
-[assembly: OwinStartupAttribute(typeof(AppStore.Startup))]
+[assembly: OwinStartup(typeof(Startup))]
 namespace AppStore
 {
     public partial class Startup

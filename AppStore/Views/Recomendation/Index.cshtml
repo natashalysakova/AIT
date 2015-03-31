@@ -1,5 +1,4 @@
-﻿@using System
-@using AppStore.Controllers
+﻿@using AppStore.Controllers
 @using AppStore.Models
 @model AppStore.Controllers.RecomendationModel
 @{
@@ -33,13 +32,13 @@
         <th></th>
         @foreach (Users user in Model.Users)
         {
-            <th>@user.Name.Split(new char[] {'@'}, StringSplitOptions.RemoveEmptyEntries)[0]</th>
+            <th>@user.Name.Split(new[] {'@'}, StringSplitOptions.RemoveEmptyEntries)[0]</th>
         }
     </tr>
     @foreach (Users user in Model.Users)
     {
         <tr>
-            <th>@user.Name.Split(new char[] { '@' }, StringSplitOptions.RemoveEmptyEntries)[0]</th>
+            <th>@user.Name.Split(new[] { '@' }, StringSplitOptions.RemoveEmptyEntries)[0]</th>
             @foreach (Users user2 in Model.Users)
             {
                 foreach (Likness likness in Model.Liknesses)

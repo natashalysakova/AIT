@@ -9,9 +9,6 @@
 
 namespace AppStore.Models
 {
-    using System;
-    using System.Collections.Generic;
-    
     public partial class Scores
     {
         public int Id { get; set; }
